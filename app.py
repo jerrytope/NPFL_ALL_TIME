@@ -46,18 +46,31 @@ def main():
         st.dataframe(team_data[['home', 'away', 'home_goal', 'away_goal']])
 
     # Step 8: Display the head-to-head comparison
-    st.subheader("Head-to-Head Comparison form 2003 Till Date")
+    st.subheader("NPFL Head-to-Head Comparison from 2002/03 Till Date")
     head_to_head_plot(team_data, team1, team2)
 
     # Step 9: Display total goals scored by each team
-    st.subheader("Total Goals Scored from 2023 Till Date")
+    st.subheader("Total Goals Scored from 2002/03 Till Date")
     total_goals_plot(data, team1, team2)
 
+    st.subheader(f"Head-to-Head Stats for {team1} and {team2}")
+    (average_goals_scored_team1, average_goals_conceded_team1), (average_goals_scored_team2, average_goals_conceded_team2) = calculate_head_to_head_totals(data, team1, team2)
+
     st.header("Average Goals Analysis")
-    for team in selected_teams:
-        st.write(f"**{team}**:")
-        st.write(f"Average Goals Scored: {calculate_average_goals(team_data, team, is_home_team=True):.2f}")
-        st.write(f"Average Goals Conceded: {calculate_average_goals(team_data, team, is_home_team=False):.2f}")
+    st.write(f"**{team1}**:")
+    st.write(f"Average Goals Scored: {average_goals_scored_team1:.2f}")
+    st.write(f"Average Goals Conceded: {average_goals_conceded_team1:.2f}")
+
+    st.write(f"**{team2}**:")
+    st.write(f"Average Goals Scored: {average_goals_scored_team2:.2f}")
+    st.write(f"Average Goals Conceded: {average_goals_conceded_team2:.2f}")
+
+
+    # st.header("Average Goals Analysis")
+    # for team in selected_teams:
+    #     st.write(f"**{team}**:")
+    #     st.write(f"Average Goals Scored: {calculate_average_goals(team_data, team, is_home_team=True):.2f}")
+    #     st.write(f"Average Goals Conceded: {calculate_average_goals(team_data, team, is_home_team=False):.2f}")
 
   
 
@@ -71,9 +84,16 @@ def main():
     goals_distribution['leg'] = goals_distribution.groupby('season').cumcount() + 1
     goals_distribution['leg'] = goals_distribution['leg'].replace({1: 'First Leg', 2: 'Second Leg'})
 
-    # Print out the number of goals per season
     st.write("Number of goals per season:")
-    st.table(goals_distribution[['season', 'total_goals']].groupby('season').sum().astype(int))
+    # Group by season, sum the total_goals, convert to int, and sort by total_goals
+    sorted_goals_distribution = goals_distribution[['season', 'total_goals']].groupby('season').sum().astype(int).sort_values(by='total_goals', ascending=False)
+
+    # Display the sorted table
+    st.table(sorted_goals_distribution)
+
+    # Print out the number of goals per season
+    
+    # st.table(goals_distribution[['season', 'total_goals']].groupby('season').sum().astype(int))
 
     # Filter to include only the last 10 seasons
     last_10_seasons = goals_distribution['season'].unique()[-10:]
@@ -127,12 +147,19 @@ def main():
     last_5_team1_games['result'] = last_5_team1_games.apply(determine_result, axis=1, team=team1)
     last_5_team2_games['result'] = last_5_team2_games.apply(determine_result, axis=1, team=team2)
 
-    st.subheader(f"Last 5 games involving {team1}")
+    team1_results_str = generate_result_string(last_5_team1_games)
+    team2_results_str = generate_result_string(last_5_team2_games)
+
+
+    st.subheader(f"Last 5 NPFL games involving {team1}: {team1_results_str}")
     st.write(display_last_n_games(last_5_team1_games))
 
-    st.subheader(f"Last 5 games involving {team2}")
+    st.subheader(f"Last 5 NPFL games involving {team2}: {team2_results_str}")
     st.write(display_last_n_games(last_5_team2_games))
 
+
+def generate_result_string(last_n_team_games):
+    return ''.join(last_n_team_games['result'].values)
 # Step 10: Data Visualization functions
 def filter_team_games(data, team):
     return data[(data['home'] == team) | (data['away'] == team)]
@@ -194,7 +221,8 @@ def head_to_head_plot(data, team1, team2):
 
     team1_matches = data[(data['home'] == team1) | (data['away'] == team1)]
     team2_matches = data[(data['home'] == team2) | (data['away'] == team2)]
-    total_matches = (int(len(team1_matches)) + int(len(team2_matches))) / 2
+    total_matches = round((int(len(team1_matches)) + int(len(team2_matches))) / 2)
+    # total_matches = str()
 
     logo = Image.open("Logo.png")
     logo = logo.resize((400, 400), PIL.Image.Resampling.LANCZOS)
@@ -212,9 +240,9 @@ def head_to_head_plot(data, team1, team2):
     ax.set_xticks([pos + bar_width / 2 for pos in bar_positions])
     ax.set_xticklabels(x_labels)
     ax.set_ylabel('Matches')
-    ax.set_title(f'{team1} vs. {team2} Head-to-Head Comparison from 2023 Till Date')
+    ax.set_title(f'{team1} vs. {team2} NPFL Head-to-Head Comparison from 2002/03 Till Date')
     ax.legend()
-    st.write(f"Total matches played by {team1} and {team2}: {total_matches}")
+    st.write(f"Total NPFL matches played by {team1} and {team2}: {total_matches}")
     st.pyplot(fig)
 
 def total_goals_plot(data, team1, team2):
@@ -223,14 +251,14 @@ def total_goals_plot(data, team1, team2):
 
     team1_home_data = team1_goals[team1_goals['home'] == team1]
     team1_away_data = team1_goals[team1_goals['away'] == team1]
-    team1_score = team1_home_data['home_goal'].sum() + team1_away_data['away_goal'].sum()
+    team1_score = round(team1_home_data['home_goal'].sum() + team1_away_data['away_goal'].sum())
 
     team2_home_data = team2_goals[team2_goals['home'] == team2]
     team2_away_data = team2_goals[team2_goals['away'] == team2]
-    team2_score = team2_home_data['home_goal'].sum() + team2_away_data['away_goal'].sum()
+    team2_score = round(team2_home_data['home_goal'].sum() + team2_away_data['away_goal'].sum())
 
-    st.write(team1 + " total goals against " + team2, team1_score)
-    st.write(team2 + " total goals against " + team1, team2_score)
+    st.write(team1 + " total goals against " + team2 + ": " + str(team1_score))
+    st.write(team2 + " total goals against " + team1 + ": " + str(team2_score))
 
     x_labels = [team1, team2]
     y_values = [team1_score, team2_score]
@@ -260,20 +288,70 @@ def total_goals_plot(data, team1, team2):
     ax.set_ylabel('Total Goals Scored')
     st.pyplot(fig)
 
-def calculate_average_goals(team_data, team_name, is_home_team=True):
-    if is_home_team:
-        goals_column = 'home_goal'
+# def calculate_average_goals(team_data, team_name, is_home_team=True):
+#     if is_home_team:
+#         goals_column = 'home_goal'
+#     else:
+#         goals_column = 'away_goal'
+
+#     total_goals = team_data[team_data['home' if is_home_team else 'away'] == team_name][goals_column].sum()
+#     total_matches = len(team_data[team_data['home' if is_home_team else 'away'] == team_name])
+
+
+#     st.write(f"Total goals for {team_name} ({'home' if is_home_team else 'away'}): {total_goals}")
+#     st.write(f"Total games for {team_name} ({'home' if is_home_team else 'away'}): {total_matches}")
+
+#     if total_matches == 0:
+#         return 0
+
+#     average_goals = total_goals / total_matches
+#     return average_goals
+
+def calculate_head_to_head_totals(team_data, team1, team2):
+    # Filter data for matches between team1 and team2
+    head_to_head_data = team_data[((team_data['home'] == team1) & (team_data['away'] == team2)) |
+                                  ((team_data['home'] == team2) & (team_data['away'] == team1))]
+
+    # Calculate total goals and matches for team1
+    total_goals_team1 = head_to_head_data[(head_to_head_data['home'] == team1)]['home_goal'].sum() + \
+                        head_to_head_data[(head_to_head_data['away'] == team1)]['away_goal'].sum()
+    total_goals_conceded_team1 = head_to_head_data[(head_to_head_data['home'] == team1)]['away_goal'].sum() + \
+                                 head_to_head_data[(head_to_head_data['away'] == team1)]['home_goal'].sum()
+    total_matches_team1 = len(head_to_head_data[(head_to_head_data['home'] == team1) | (head_to_head_data['away'] == team1)])
+
+    # Calculate total goals and matches for team2
+    total_goals_team2 = head_to_head_data[(head_to_head_data['home'] == team2)]['home_goal'].sum() + \
+                        head_to_head_data[(head_to_head_data['away'] == team2)]['away_goal'].sum()
+    total_goals_conceded_team2 = head_to_head_data[(head_to_head_data['home'] == team2)]['away_goal'].sum() + \
+                                 head_to_head_data[(head_to_head_data['away'] == team2)]['home_goal'].sum()
+    total_matches_team2 = len(head_to_head_data[(head_to_head_data['home'] == team2) | (head_to_head_data['away'] == team2)])
+
+    # Create a DataFrame to display the totals
+    totals_df = pd.DataFrame({
+        'Metric': ['Total Goals', 'Total Goals Conceded', 'Total Matches'],
+        team1: [int(total_goals_team1), int(total_goals_conceded_team1), total_matches_team1],
+        team2: [int(total_goals_team2), int(total_goals_conceded_team2), total_matches_team2]
+    })
+
+    st.table(totals_df)
+
+    # Calculate average goals scored and conceded
+    if total_matches_team1 > 0:
+        average_goals_scored_team1 = total_goals_team1 / total_matches_team1
+        average_goals_conceded_team1 = total_goals_conceded_team1 / total_matches_team1
     else:
-        goals_column = 'away_goal'
+        average_goals_scored_team1 = 0
+        average_goals_conceded_team1 = 0
 
-    total_goals = team_data[team_data['home' if is_home_team else 'away'] == team_name][goals_column].sum()
-    total_matches = len(team_data[team_data['home' if is_home_team else 'away'] == team_name])
+    if total_matches_team2 > 0:
+        average_goals_scored_team2 = total_goals_team2 / total_matches_team2
+        average_goals_conceded_team2 = total_goals_conceded_team2 / total_matches_team2
+    else:
+        average_goals_scored_team2 = 0
+        average_goals_conceded_team2 = 0
 
-    if total_matches == 0:
-        return 0
+    return (average_goals_scored_team1, average_goals_conceded_team1), (average_goals_scored_team2, average_goals_conceded_team2)
 
-    average_goals = total_goals / total_matches
-    return average_goals
 
 # Step 11: Run the app
 if __name__ == "__main__":
