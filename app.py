@@ -59,28 +59,16 @@ def main():
         st.write(f"Average Goals Scored: {calculate_average_goals(team_data, team, is_home_team=True):.2f}")
         st.write(f"Average Goals Conceded: {calculate_average_goals(team_data, team, is_home_team=False):.2f}")
 
-    # st.title("Goals Distribution by season")
-    # # Group data by team and season, and sum the goals
-    # goals_distribution = team_data.groupby(['home', 'season'])[['home_goal', 'away_goal']].sum().reset_index()
+    st.title("Goals Distribution by Season")
+    # Group data by team and season, and sum the goals
+    goals_distribution = team_data.groupby(['home', 'season'])[['home_goal', 'away_goal']].sum().reset_index()
 
-    # # Sum the total goals (home_goal + away_goal)
-    # goals_distribution['total_goals'] = goals_distribution['home_goal'].astype(int) + goals_distribution['away_goal'].astype(int)
+    # Sum the total goals (home_goal + away_goal)
+    goals_distribution['total_goals'] = goals_distribution['home_goal'].astype(int) + goals_distribution['away_goal'].astype(int)
+    goals_distribution['leg'] = goals_distribution.groupby('season').cumcount() + 1
+    goals_distribution['leg'] = goals_distribution['leg'].replace({1: 'First Leg', 2: 'Second Leg'})
 
-    # # Print out the number of goals per season
-    # st.write("Number of goals per season:")
-    # st.table(goals_distribution[['season', 'total_goals']].groupby('season').sum().astype(int))
-
-    # # Update the labels to 'First Leg' and 'Second Leg'
-    # goals_distribution['leg'] = goals_distribution.groupby('season').cumcount() + 1
-    # goals_distribution['leg'] = goals_distribution['leg'].replace({1: 'First Leg', 2: 'Second Leg'})
-
-    # # Plot the bar chart
-    # plt.figure(figsize=(10, 6))
-    # sns.barplot(x='season', y='total_goals', hue="leg", data=goals_distribution, ci=None)
-    # plt.title("Goals Distribution by season From 2023 Till Date prt")
-    # plt.xlabel("Season")
-    # plt.ylabel("Total Goals")
-    # st.pyplot(plt)
+    # Print out the number of goals per season
     st.title("Goals Distribution by Season")
     # Group data by team and season, and sum the goals
     goals_distribution = team_data.groupby(['home', 'season'])[['home_goal', 'away_goal']].sum().reset_index()
@@ -98,6 +86,9 @@ def main():
     last_10_seasons = goals_distribution['season'].unique()[-10:]
     goals_distribution_last_10 = goals_distribution[goals_distribution['season'].isin(last_10_seasons)]
 
+    # Sort the data by season to ensure chronological order
+    goals_distribution_last_10 = goals_distribution_last_10.sort_values(by='season')
+
     # Plot the bar chart for the last 10 seasons
     plt.figure(figsize=(10, 6))
     sns.barplot(x='season', y='total_goals', hue="leg", data=goals_distribution_last_10, ci=None)
@@ -108,6 +99,30 @@ def main():
     # Rotate the x-axis labels for better readability
     plt.xticks(rotation=45, ha='right', fontsize=10)  # ha='right' for better alignment, fontsize can be adjusted if needed
 
+    st.pyplot(plt)
+
+    st.title("Goals Distribution by Season per Team")
+    goals_distribution_per_team = team_data.groupby(['season', 'home'])[['home_goal']].sum().reset_index()
+    goals_distribution_per_team = goals_distribution_per_team.rename(columns={'home': 'team', 'home_goal': 'goals_scored'})
+    
+    # Sum away goals per team and merge with home goals
+    away_goals_per_team = team_data.groupby(['season', 'away'])[['away_goal']].sum().reset_index()
+    away_goals_per_team = away_goals_per_team.rename(columns={'away': 'team', 'away_goal': 'goals_scored'})
+    
+    goals_distribution_per_team = pd.concat([goals_distribution_per_team, away_goals_per_team], axis=0)
+    goals_distribution_per_team = goals_distribution_per_team.groupby(['season', 'team'])[['goals_scored']].sum().reset_index()
+
+    st.write("Number of goals per season per team:")
+    st.table(goals_distribution_per_team.pivot(index='season', columns='team', values='goals_scored').fillna(0).astype(int))
+
+    goals_distribution_per_team_last_10 = goals_distribution_per_team[goals_distribution_per_team['season'].isin(last_10_seasons)]
+
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x='season', y='goals_scored', hue='team', data=goals_distribution_per_team_last_10, ci=None)
+    plt.title("Goals Distribution by Season per Team (Last 10 Seasons)")
+    plt.xlabel("Season")
+    plt.ylabel("Total Goals")
+    plt.xticks(rotation=45, ha='right', fontsize=10)
     st.pyplot(plt)
 
     team1_games = filter_team_games(data, team1)
