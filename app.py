@@ -59,14 +59,7 @@ def main():
         st.write(f"Average Goals Scored: {calculate_average_goals(team_data, team, is_home_team=True):.2f}")
         st.write(f"Average Goals Conceded: {calculate_average_goals(team_data, team, is_home_team=False):.2f}")
 
-    st.title("Goals Distribution by Season")
-    # Group data by team and season, and sum the goals
-    goals_distribution = team_data.groupby(['home', 'season'])[['home_goal', 'away_goal']].sum().reset_index()
-
-    # Sum the total goals (home_goal + away_goal)
-    goals_distribution['total_goals'] = goals_distribution['home_goal'].astype(int) + goals_distribution['away_goal'].astype(int)
-    goals_distribution['leg'] = goals_distribution.groupby('season').cumcount() + 1
-    goals_distribution['leg'] = goals_distribution['leg'].replace({1: 'First Leg', 2: 'Second Leg'})
+  
 
     # Print out the number of goals per season
     st.title("Goals Distribution by Season")
