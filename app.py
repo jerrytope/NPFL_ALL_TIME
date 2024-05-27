@@ -240,7 +240,7 @@ def head_to_head_plot(data, team1, team2):
     ax.set_xticks([pos + bar_width / 2 for pos in bar_positions])
     ax.set_xticklabels(x_labels)
     ax.set_ylabel('Matches')
-    ax.set_title(f'{team1} vs. {team2} NPFL Head-to-Head Comparison from 2002/03 Till Date')
+    ax.set_title(f'{team1} vs. {team2} NPFL Comparison from 2002/03 Till Date')
     ax.legend()
     st.write(f"Total NPFL matches played by {team1} and {team2}: {total_matches}")
     st.pyplot(fig)
