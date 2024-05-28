@@ -1,6 +1,3 @@
-
-
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
@@ -66,17 +63,9 @@ def main():
     st.write(f"Average Goals Conceded: {average_goals_conceded_team2:.2f}")
 
 
-    # st.header("Average Goals Analysis")
-    # for team in selected_teams:
-    #     st.write(f"**{team}**:")
-    #     st.write(f"Average Goals Scored: {calculate_average_goals(team_data, team, is_home_team=True):.2f}")
-    #     st.write(f"Average Goals Conceded: {calculate_average_goals(team_data, team, is_home_team=False):.2f}")
-
   
-
-    # Print out the number of goals per season
     st.title("Goals Distribution by Season")
-    # Group data by team and season, and sum the goals
+
     goals_distribution = team_data.groupby(['home', 'season'])[['home_goal', 'away_goal']].sum().reset_index()
 
     # Sum the total goals (home_goal + away_goal)
@@ -91,28 +80,52 @@ def main():
     # Display the sorted table
     st.table(sorted_goals_distribution)
 
-    # Print out the number of goals per season
-    
-    # st.table(goals_distribution[['season', 'total_goals']].groupby('season').sum().astype(int))
-
     # Filter to include only the last 10 seasons
-    last_10_seasons = goals_distribution['season'].unique()[-10:]
-    goals_distribution_last_10 = goals_distribution[goals_distribution['season'].isin(last_10_seasons)]
+    last_10_seasons = goals_distribution['season'].unique()[-11:]
 
-    # Sort the data by season to ensure chronological order
-    goals_distribution_last_10 = goals_distribution_last_10.sort_values(by='season')
+    # Plot horizontal bar chart using top 10 sorted_goals_distribution
+    top_10_goals_distribution = sorted_goals_distribution.head(10)
+    plt.figure(figsize=(10, 8))
+    sns.barplot(x=top_10_goals_distribution['total_goals'], y=top_10_goals_distribution.index, palette="viridis")
+    plt.title("Top 10 Seasons by Total Goals")
+    plt.xlabel("Total Goals")
+    plt.ylabel("Season")
+    plt.yticks(rotation=0, fontsize=10)  # Ensure y-axis labels are readable
 
-    # Plot the bar chart for the last 10 seasons
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x='season', y='total_goals', hue="leg", data=goals_distribution_last_10, ci=None)
-    plt.title("Goals Distribution by Season (Last 10 Seasons)")
-    plt.xlabel("Season")
-    plt.ylabel("Total Goals")
+    # Add the first logo
+    logo1 = Image.open("logos/3.png")
+    logo1 = logo1.resize((400, 400), Image.Resampling.LANCZOS)
+    opacity = 0.2
+    enhancer = ImageEnhance.Brightness(logo1)
+    logo1 = enhancer.enhance(opacity)
 
-    # Rotate the x-axis labels for better readability
-    plt.xticks(rotation=45, ha='right', fontsize=10)  # ha='right' for better alignment, fontsize can be adjusted if needed
+    # Add the second logo
+    logo2 = Image.open("logos/1.png")
+    logo2 = logo2.resize((400, 400), Image.Resampling.LANCZOS)
+    enhancer = ImageEnhance.Brightness(logo2)
+    logo2 = enhancer.enhance(opacity)
 
-    st.pyplot(plt)
+    fig = plt.gcf()
+    ax = plt.gca()
+
+    # Calculate position for the first logo (top center)
+    center_x1 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo1.size[0] / 2)
+    center_y1 = fig.bbox.y0 - (logo1.size[1] / 2) + (logo1.size[0] * 1.85 )
+
+    # Calculate position for the second logo (bottom center)
+    center_x2 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo2.size[0] / 2)
+    center_y2 = fig.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
+
+    # Place the logos
+    fig.figimage(logo1, xo=center_x1, yo=center_y1, origin='upper')
+    fig.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
+
+    # Render the chart
+    st.pyplot(fig)
+
+
+        
+
 
     st.title("Goals Distribution by Season per Team")
     goals_distribution_per_team = team_data.groupby(['season', 'home'])[['home_goal']].sum().reset_index()
@@ -129,14 +142,45 @@ def main():
     st.table(goals_distribution_per_team.pivot(index='season', columns='team', values='goals_scored').fillna(0).astype(int))
 
     goals_distribution_per_team_last_10 = goals_distribution_per_team[goals_distribution_per_team['season'].isin(last_10_seasons)]
-
+    goals_distribution_per_team_last_10 = goals_distribution_per_team_last_10[2:]
     plt.figure(figsize=(10, 6))
-    sns.barplot(x='season', y='goals_scored', hue='team', data=goals_distribution_per_team_last_10, ci=None)
+    sns.barplot(x='season', y='goals_scored', hue='team', data=goals_distribution_per_team_last_10, ci=None, palette="viridis")
     plt.title("Goals Distribution by Season per Team (Last 10 Seasons)")
     plt.xlabel("Season")
     plt.ylabel("Total Goals")
     plt.xticks(rotation=45, ha='right', fontsize=10)
-    st.pyplot(plt)
+
+    logo1 = Image.open("logos/3.png")
+    logo1 = logo1.resize((400, 400), Image.Resampling.LANCZOS)
+    opacity = 0.2
+    enhancer = ImageEnhance.Brightness(logo1)
+    logo1 = enhancer.enhance(opacity)
+
+    # Add the second logo
+    logo2 = Image.open("logos/1.png")
+    logo2 = logo2.resize((400, 400), Image.Resampling.LANCZOS)
+    enhancer = ImageEnhance.Brightness(logo2)
+    logo2 = enhancer.enhance(opacity)
+
+    fig2 = plt.gcf()
+    ax2 = plt.gca()
+
+    # Calculate position for the first logo (top center)
+    center_x1 = (fig2.bbox.x0 + fig2.bbox.width / 2) + (logo1.size[0] / 2)
+    center_y1 = fig2.bbox.y0 - (logo1.size[1] / 2) + (logo1.size[0] * 1.85 )
+
+    # Calculate position for the second logo (bottom center)
+    center_x2 = (fig2.bbox.x0 + fig2.bbox.width / 2) + (logo2.size[0] / 2)
+    center_y2 = fig2.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
+
+    # Place the logos
+    fig2.figimage(logo1, xo=center_x1, yo=center_y1, origin='upper')
+    fig2.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
+
+    # Render the chart
+    st.pyplot(fig2)
+
+  
 
     team1_games = filter_team_games(data, team1)
     team2_games = filter_team_games(data, team2)
@@ -224,18 +268,46 @@ def head_to_head_plot(data, team1, team2):
     total_matches = round((int(len(team1_matches)) + int(len(team2_matches))) / 2)
     # total_matches = str()
 
-    logo = Image.open("Logo.png")
-    logo = logo.resize((400, 400), PIL.Image.Resampling.LANCZOS)
+    # logo = Image.open("logos/3.png")
+    # logo = logo.resize((400, 400), PIL.Image.Resampling.LANCZOS)
+    # opacity = 0.2
+    # enhancer = ImageEnhance.Brightness(logo)
+    # logo = enhancer.enhance(opacity)
+
+    # logo_width, logo_height = logo.size
+    # center_x = (fig.get_figwidth() + logo_width) * 1.0
+    # center_y = (fig.get_figheight() + logo_height) * 0.5
+
+    # # Place the logo in the middle
+    # ax.figure.figimage(logo, xo=center_x, yo=center_y, origin='upper')
+
+    logo1 = Image.open("logos/3.png")
+    logo1 = logo1.resize((400, 400), Image.Resampling.LANCZOS)
     opacity = 0.2
-    enhancer = ImageEnhance.Brightness(logo)
-    logo = enhancer.enhance(opacity)
+    enhancer = ImageEnhance.Brightness(logo1)
+    logo1 = enhancer.enhance(opacity)
 
-    logo_width, logo_height = logo.size
-    center_x = (fig.get_figwidth() + logo_width) * 1.0
-    center_y = (fig.get_figheight() + logo_height) * 0.5
+    # Add the second logo
+    logo2 = Image.open("logos/1.png")
+    logo2 = logo2.resize((400, 400), Image.Resampling.LANCZOS)
+    enhancer = ImageEnhance.Brightness(logo2)
+    logo2 = enhancer.enhance(opacity)
 
-    # Place the logo in the middle
-    ax.figure.figimage(logo, xo=center_x, yo=center_y, origin='upper')
+    fig = plt.gcf()
+    ax = plt.gca()
+
+    # Calculate position for the first logo (top center)
+    center_x1 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo1.size[0] / 3)
+    center_y1 = fig.bbox.y0 - (logo1.size[1] / 2) + (logo1.size[0]  )
+
+    # Calculate position for the second logo (bottom center)
+    center_x2 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo2.size[0] / 3)
+    center_y2 = fig.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
+
+    # Place the logos
+    fig.figimage(logo1, xo=center_x1, yo=center_y1, origin='upper')
+    fig.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
+
 
     ax.set_xticks([pos + bar_width / 2 for pos in bar_positions])
     ax.set_xticklabels(x_labels)
@@ -268,44 +340,42 @@ def total_goals_plot(data, team1, team2):
 
     fig, ax = plt.subplots(figsize=(4, 3))
 
-    logo = Image.open("Logo.png")
-    logo = logo.resize((270, 270), PIL.Image.LANCZOS)
+    logo1 = Image.open("logos/3.png")
+    logo1 = logo1.resize((300, 300), Image.Resampling.LANCZOS)
     opacity = 0.2
-    enhancer = ImageEnhance.Brightness(logo)
-    logo = enhancer.enhance(opacity)
+    enhancer = ImageEnhance.Brightness(logo1)
+    logo1 = enhancer.enhance(opacity)
 
-    logo_width, logo_height = logo.size
-    center_x = (fig.get_figwidth() + logo_width) * 1.0
-    center_y = (fig.get_figheight() + logo_height) * 0.5
+    # Add the second logo
+    logo2 = Image.open("logos/1.png")
+    logo2 = logo2.resize((300, 300), Image.Resampling.LANCZOS)
+    enhancer = ImageEnhance.Brightness(logo2)
+    logo2 = enhancer.enhance(opacity)
+
+    fig = plt.gcf()
+    ax = plt.gca()
+
+    # Calculate position for the first logo (top center)
+    center_x1 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo1.size[0] / 3.5)
+    center_y1 = fig.bbox.y0 - (logo1.size[1] / 2) + (logo1.size[0] / 1.2)
+
+    # Calculate position for the second logo (bottom center)
+    center_x2 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo2.size[0] / 3.5)
+    center_y2 = fig.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
+
+    # Place the logos
+    fig.figimage(logo1, xo=center_x1, yo=center_y1, origin='upper')
+    fig.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
 
     # Place the logo in the middle
-    ax.figure.figimage(logo, xo=center_x, yo=center_y, origin='upper')
-    ax.bar(x_labels, y_values, width=bar_width, color=['darkblue', 'purple'])
-    for i, value in enumerate(y_values):
-        # ax.text(i, value + 1, value, ha='center')
-        pass
+    # ax.figure.figimage(logo, xo=center_x, yo=center_y, origin='upper')
+    ax.bar(x_labels, y_values, width=bar_width, color=['#0078D4', 'purple'])
+    # for i, value in enumerate(y_values):
+    #     # ax.text(i, value + 1, value, ha='center')
+    #     pass
 
     ax.set_ylabel('Total Goals Scored')
     st.pyplot(fig)
-
-# def calculate_average_goals(team_data, team_name, is_home_team=True):
-#     if is_home_team:
-#         goals_column = 'home_goal'
-#     else:
-#         goals_column = 'away_goal'
-
-#     total_goals = team_data[team_data['home' if is_home_team else 'away'] == team_name][goals_column].sum()
-#     total_matches = len(team_data[team_data['home' if is_home_team else 'away'] == team_name])
-
-
-#     st.write(f"Total goals for {team_name} ({'home' if is_home_team else 'away'}): {total_goals}")
-#     st.write(f"Total games for {team_name} ({'home' if is_home_team else 'away'}): {total_matches}")
-
-#     if total_matches == 0:
-#         return 0
-
-#     average_goals = total_goals / total_matches
-#     return average_goals
 
 def calculate_head_to_head_totals(team_data, team1, team2):
     # Filter data for matches between team1 and team2
