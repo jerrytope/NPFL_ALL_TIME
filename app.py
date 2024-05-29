@@ -141,10 +141,12 @@ def main():
     st.write("Number of goals per season per team:")
     st.table(goals_distribution_per_team.pivot(index='season', columns='team', values='goals_scored').fillna(0).astype(int))
 
+    team_palette = ["red", "#0078D4"]
+
     goals_distribution_per_team_last_10 = goals_distribution_per_team[goals_distribution_per_team['season'].isin(last_10_seasons)]
     goals_distribution_per_team_last_10 = goals_distribution_per_team_last_10[2:]
     plt.figure(figsize=(10, 6))
-    sns.barplot(x='season', y='goals_scored', hue='team', data=goals_distribution_per_team_last_10, ci=None, palette=sns.color_palette("Reds")[::-2])
+    sns.barplot(x='season', y='goals_scored', hue='team', data=goals_distribution_per_team_last_10, ci=None, palette=team_palette)
     plt.title("Goals Distribution by Season per Team (Last 10 Seasons)")
     plt.xlabel("Season")
     plt.ylabel("Total Goals")
