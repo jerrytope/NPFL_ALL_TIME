@@ -86,24 +86,24 @@ def main():
     # Plot horizontal bar chart using top 10 sorted_goals_distribution
     top_10_goals_distribution = sorted_goals_distribution.head(10)
     plt.figure(figsize=(10, 8))
-    sns.barplot(x=top_10_goals_distribution['total_goals'], y=top_10_goals_distribution.index, palette="viridis")
+    sns.barplot(x=top_10_goals_distribution['total_goals'], y=top_10_goals_distribution.index, palette=sns.color_palette("Reds")[::-2])
     plt.title("Top 10 Seasons by Total Goals")
     plt.xlabel("Total Goals")
     plt.ylabel("Season")
     plt.yticks(rotation=0, fontsize=10)  # Ensure y-axis labels are readable
 
     # Add the first logo
-    logo1 = Image.open("logos/3.png")
+    logo1 = Image.open("logos/logo.png")
     logo1 = logo1.resize((400, 400), Image.Resampling.LANCZOS)
     opacity = 0.2
     enhancer = ImageEnhance.Brightness(logo1)
     logo1 = enhancer.enhance(opacity)
 
     # Add the second logo
-    logo2 = Image.open("logos/1.png")
-    logo2 = logo2.resize((400, 400), Image.Resampling.LANCZOS)
-    enhancer = ImageEnhance.Brightness(logo2)
-    logo2 = enhancer.enhance(opacity)
+    # logo2 = Image.open("logos/1.png")
+    # logo2 = logo2.resize((400, 400), Image.Resampling.LANCZOS)
+    # enhancer = ImageEnhance.Brightness(logo2)
+    # logo2 = enhancer.enhance(opacity)
 
     fig = plt.gcf()
     ax = plt.gca()
@@ -113,12 +113,12 @@ def main():
     center_y1 = fig.bbox.y0 - (logo1.size[1] / 2) + (logo1.size[0] * 1.85 )
 
     # Calculate position for the second logo (bottom center)
-    center_x2 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo2.size[0] / 2)
-    center_y2 = fig.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
+    # center_x2 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo2.size[0] / 2)
+    # center_y2 = fig.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
 
     # Place the logos
     fig.figimage(logo1, xo=center_x1, yo=center_y1, origin='upper')
-    fig.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
+    # fig.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
 
     # Render the chart
     st.pyplot(fig)
@@ -144,23 +144,23 @@ def main():
     goals_distribution_per_team_last_10 = goals_distribution_per_team[goals_distribution_per_team['season'].isin(last_10_seasons)]
     goals_distribution_per_team_last_10 = goals_distribution_per_team_last_10[2:]
     plt.figure(figsize=(10, 6))
-    sns.barplot(x='season', y='goals_scored', hue='team', data=goals_distribution_per_team_last_10, ci=None, palette="viridis")
+    sns.barplot(x='season', y='goals_scored', hue='team', data=goals_distribution_per_team_last_10, ci=None, palette=sns.color_palette("Reds")[::-2])
     plt.title("Goals Distribution by Season per Team (Last 10 Seasons)")
     plt.xlabel("Season")
     plt.ylabel("Total Goals")
     plt.xticks(rotation=45, ha='right', fontsize=10)
 
-    logo1 = Image.open("logos/3.png")
+    logo1 = Image.open("logos/logo.png")
     logo1 = logo1.resize((400, 400), Image.Resampling.LANCZOS)
     opacity = 0.2
     enhancer = ImageEnhance.Brightness(logo1)
     logo1 = enhancer.enhance(opacity)
 
     # Add the second logo
-    logo2 = Image.open("logos/1.png")
-    logo2 = logo2.resize((400, 400), Image.Resampling.LANCZOS)
-    enhancer = ImageEnhance.Brightness(logo2)
-    logo2 = enhancer.enhance(opacity)
+    # logo2 = Image.open("logos/1.png")
+    # logo2 = logo2.resize((400, 400), Image.Resampling.LANCZOS)
+    # enhancer = ImageEnhance.Brightness(logo2)
+    # logo2 = enhancer.enhance(opacity)
 
     fig2 = plt.gcf()
     ax2 = plt.gca()
@@ -170,12 +170,12 @@ def main():
     center_y1 = fig2.bbox.y0 - (logo1.size[1] / 2) + (logo1.size[0] * 1.85 )
 
     # Calculate position for the second logo (bottom center)
-    center_x2 = (fig2.bbox.x0 + fig2.bbox.width / 2) + (logo2.size[0] / 2)
-    center_y2 = fig2.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
+    # center_x2 = (fig2.bbox.x0 + fig2.bbox.width / 2) + (logo2.size[0] / 2)
+    # center_y2 = fig2.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
 
     # Place the logos
     fig2.figimage(logo1, xo=center_x1, yo=center_y1, origin='upper')
-    fig2.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
+    # fig2.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
 
     # Render the chart
     st.pyplot(fig2)
@@ -252,7 +252,7 @@ def head_to_head_plot(data, team1, team2):
     bar_width = 0.15
     bar_positions = list(range(len(x_labels)))
 
-    ax.bar(bar_positions, team1_values, bar_width, label=team1, color=['purple'])
+    ax.bar(bar_positions, team1_values, bar_width, label=team1, color=['red'])
     ax.bar([pos + bar_width for pos in bar_positions], team2_values, bar_width, label=team2)
 
     for i, value in enumerate(team1_values):
@@ -265,33 +265,23 @@ def head_to_head_plot(data, team1, team2):
 
     team1_matches = data[(data['home'] == team1) | (data['away'] == team1)]
     team2_matches = data[(data['home'] == team2) | (data['away'] == team2)]
-    total_matches = round((int(len(team1_matches)) + int(len(team2_matches))) / 2)
-    # total_matches = str()
+    #total_matches = round((int(len(team1_matches)) + int(len(team2_matches))) / 2)
 
-    # logo = Image.open("logos/3.png")
-    # logo = logo.resize((400, 400), PIL.Image.Resampling.LANCZOS)
-    # opacity = 0.2
-    # enhancer = ImageEnhance.Brightness(logo)
-    # logo = enhancer.enhance(opacity)
+    total_matches = len(home_wins_team1) + len(away_wins_team1) + len(home_wins_team2) + len(away_wins_team2) + len(draws_team1)
 
-    # logo_width, logo_height = logo.size
-    # center_x = (fig.get_figwidth() + logo_width) * 1.0
-    # center_y = (fig.get_figheight() + logo_height) * 0.5
+  
 
-    # # Place the logo in the middle
-    # ax.figure.figimage(logo, xo=center_x, yo=center_y, origin='upper')
-
-    logo1 = Image.open("logos/3.png")
+    logo1 = Image.open("logos/logo.png")
     logo1 = logo1.resize((400, 400), Image.Resampling.LANCZOS)
     opacity = 0.2
     enhancer = ImageEnhance.Brightness(logo1)
     logo1 = enhancer.enhance(opacity)
 
     # Add the second logo
-    logo2 = Image.open("logos/1.png")
-    logo2 = logo2.resize((400, 400), Image.Resampling.LANCZOS)
-    enhancer = ImageEnhance.Brightness(logo2)
-    logo2 = enhancer.enhance(opacity)
+    # logo2 = Image.open("logos/1.png")
+    # logo2 = logo2.resize((400, 400), Image.Resampling.LANCZOS)
+    # enhancer = ImageEnhance.Brightness(logo2)
+    # logo2 = enhancer.enhance(opacity)
 
     fig = plt.gcf()
     ax = plt.gca()
@@ -300,13 +290,13 @@ def head_to_head_plot(data, team1, team2):
     center_x1 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo1.size[0] / 3)
     center_y1 = fig.bbox.y0 - (logo1.size[1] / 2) + (logo1.size[0]  )
 
-    # Calculate position for the second logo (bottom center)
-    center_x2 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo2.size[0] / 3)
-    center_y2 = fig.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
+    # # Calculate position for the second logo (bottom center)
+    # center_x2 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo2.size[0] / 3)
+    # center_y2 = fig.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
 
     # Place the logos
     fig.figimage(logo1, xo=center_x1, yo=center_y1, origin='upper')
-    fig.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
+    # fig.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
 
 
     ax.set_xticks([pos + bar_width / 2 for pos in bar_positions])
@@ -340,17 +330,17 @@ def total_goals_plot(data, team1, team2):
 
     fig, ax = plt.subplots(figsize=(4, 3))
 
-    logo1 = Image.open("logos/3.png")
+    logo1 = Image.open("logos/logo.png")
     logo1 = logo1.resize((300, 300), Image.Resampling.LANCZOS)
     opacity = 0.2
     enhancer = ImageEnhance.Brightness(logo1)
     logo1 = enhancer.enhance(opacity)
 
     # Add the second logo
-    logo2 = Image.open("logos/1.png")
-    logo2 = logo2.resize((300, 300), Image.Resampling.LANCZOS)
-    enhancer = ImageEnhance.Brightness(logo2)
-    logo2 = enhancer.enhance(opacity)
+    # logo2 = Image.open("logos/1.png")
+    # logo2 = logo2.resize((300, 300), Image.Resampling.LANCZOS)
+    # enhancer = ImageEnhance.Brightness(logo2)
+    # logo2 = enhancer.enhance(opacity)
 
     fig = plt.gcf()
     ax = plt.gca()
@@ -360,16 +350,16 @@ def total_goals_plot(data, team1, team2):
     center_y1 = fig.bbox.y0 - (logo1.size[1] / 2) + (logo1.size[0] / 1.2)
 
     # Calculate position for the second logo (bottom center)
-    center_x2 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo2.size[0] / 3.5)
-    center_y2 = fig.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
+    # center_x2 = (fig.bbox.x0 + fig.bbox.width / 2) + (logo2.size[0] / 3.5)
+    # center_y2 = fig.bbox.y0 + fig.bbox.height - (logo2.size[1] / 2)
 
     # Place the logos
     fig.figimage(logo1, xo=center_x1, yo=center_y1, origin='upper')
-    fig.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
+    # fig.figimage(logo2, xo=center_x2, yo=center_y2, origin='upper')
 
     # Place the logo in the middle
     # ax.figure.figimage(logo, xo=center_x, yo=center_y, origin='upper')
-    ax.bar(x_labels, y_values, width=bar_width, color=['#0078D4', 'purple'])
+    ax.bar(x_labels, y_values, width=bar_width, color=['#0078D4', 'red'])
     # for i, value in enumerate(y_values):
     #     # ax.text(i, value + 1, value, ha='center')
     #     pass
