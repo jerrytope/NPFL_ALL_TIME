@@ -143,8 +143,19 @@ def main():
 
     team_palette = ["red", "#0078D4"]
 
+    last_10_seasons = goals_distribution_per_team['season'].unique()[-10:]
     goals_distribution_per_team_last_10 = goals_distribution_per_team[goals_distribution_per_team['season'].isin(last_10_seasons)]
-    goals_distribution_per_team_last_10 = goals_distribution_per_team_last_10[2:]
+
+# Check the length of the filtered DataFrame
+    if len(goals_distribution_per_team_last_10) >= 10:
+        goals_distribution_per_team_last_10 = goals_distribution_per_team_last_10[1:]
+    else:
+        goals_distribution_per_team_last_10 = goals_distribution_per_team[goals_distribution_per_team['season'].isin(last_10_seasons)]
+    # goals_distribution_per_team_last_10 = goals_distribution_per_team_last_10[2:]
+    # if goals_distribution_per_team_last_10 < 10:
+    #     goals_distribution_per_team_last_10 = goals_distribution_per_team[goals_distribution_per_team['season'].isin(last_10_seasons)]
+    # else:
+    #     goals_distribution_per_team_last_10 = goals_distribution_per_team_last_10[2:]
     plt.figure(figsize=(10, 6))
     sns.barplot(x='season', y='goals_scored', hue='team', data=goals_distribution_per_team_last_10, ci=None, palette=team_palette)
     plt.title("Goals Distribution by Season per Team (Last 10 Seasons)")
